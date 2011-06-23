@@ -68,6 +68,8 @@ def index(request, project_id):
         'image_lists': _image_lists(images, project_id),
     }, context_instance=template.RequestContext(request))
 
+#KDS this is where instances are launched
+#value of instance type is compared to pre-authorized/existing instance types. If some other value is passed, there is error
 
 @login_required
 @handle_nova_error
@@ -76,8 +78,21 @@ def launch(request, project_id, image_id):
 
     if request.method == 'POST':
         form = forms.LaunchInstanceForm(project, request.POST)
+#KDS obtain data from form and apppend hetero data to instance_type
+#	type_data = form.cleaned_data['size']
+#	cpufeatures_data = form.cleaned_data['CPU_features']
+#	xpuarch_data = form.cleaned_data['XPU_architecture']
+#	xpucount_data = form.cleaned_data['XPU_count']
+#	hetero1_data = []
+#	hetero1_data.append(type_data,";",cpufeatures_data,";",xpuarch_data,";",xpucount_data)
         if form.is_valid():
             try:
+	        type_data = form.cleaned_data['size']
+        	cpufeatures_data = form.cleaned_data['CPU_features']
+	        xpuarch_data = form.cleaned_data['XPU_architecture']
+	        xpucount_data = form.cleaned_data['XPU_count']
+        	hetero1_data = []
+        	hetero1_data.append((type_data,";%s;%s;%s" % (cpufeatures_data,xpuarch_data,xpucount_data)))
                 reservation = project.run_instances(
                     image_id,
                     addressing_type='private',
@@ -85,7 +100,8 @@ def launch(request, project_id, image_id):
                     #security_groups=[form.cleaned_data['security_group']],
                     user_data=re.sub('\r\n', '\n',
                                      form.cleaned_data['user_data']),
-                    instance_type=form.cleaned_data['size'],
+#                    instance_type=form.cleaned_data['size'],
+                    instance_type='m1.xlarge;xpu_arch=fermi;xpus=2',
                     min_count=form.cleaned_data['count'],
                     max_count=form.cleaned_data['count']
                 )

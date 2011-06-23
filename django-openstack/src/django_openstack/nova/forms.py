@@ -49,6 +49,10 @@ def get_instance_type_choices():
                       (t.name, t.memory_mb, t.vcpus, t.disk_gb)))
     return rv
 
+#KDS added function to append hetero meta data to instance type field (not being used/has errors..)
+def append_hetero_data(size,CPU_features,XPU_architecture,XPU_count,additional_parameters):
+	rv.append("\"", size, CPU_features, XPU_architecture, XPU_count, additional_parameters, "\"")
+	return rv
 
 def get_instance_choices(project):
     choices = [(i.id, "%s (%s)" % (i.id, i.displayName))
@@ -63,6 +67,17 @@ def get_key_pair_choices(project):
     if not len(choices):
         choices = [('', _('none available'))]
     return choices
+
+#KDS - options for CPU features selectable by the user. Hardcoded for now...
+def get_cpu_features():
+        choices = [(2,'rdtscp'),(3,'dca'),(4,'xtpr'), \
+                        (5,'tm2'),(6,'est'),(7,'vmx'), \
+                        (8,'ds_cpl'),(9,'monitor'),(10,'pbe'), \
+                        (11,'tm'),(12,'ht'),(13,'ss'), \
+                        (14,'acpi'),(15,'ds'),(16,'vme'), \
+                        (17,'sse'),(18,'sse2'),(19,'sse4')]
+        return choices
+
 
 #def get_security_group_choices(project):
 #    choices = [(g.name, g.description) for g in project.get_security_groups()]
@@ -141,10 +156,36 @@ class LaunchInstanceForm(forms.Form):
                                 widget=forms.widgets.Textarea(
                                     attrs={'rows': 4}))
 
+#KDS - all types of fields supported
+# from: openstack-dashboard/.dashboard-venv/lib64/python2.6/site-packages/django/forms/fields.py
+# 'Field', 'CharField', 'IntegerField', 'DEFAULT_DATE_INPUT_FORMATS', 'DateField',
+# 'DEFAULT_TIME_INPUT_FORMATS', 'TimeField', 'DEFAULT_DATETIME_INPUT_FORMATS', 'DateTimeField', 'TimeField',
+# 'RegexField', 'EmailField', 'FileField', 'ImageField', 'URLField','BooleanField', 'NullBooleanField', 
+# 'ChoiceField', 'MultipleChoiceField','ComboField', 'MultiValueField', 'FloatField', 'DecimalField',
+#    'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField','TypedChoiceField'
+
+#KDS - add more options for the user
+    hypervisor = forms.ChoiceField(choices=[(1, 'KVM'),(2,'Xen'),(3,'LXC')])
+    CPU_features = forms.MultipleChoiceField(required=False)
+#    HPC_features = forms.MultipleChoiceField(choices=[(1,'sse'),(2,'sse2'),(3,'sse4')])
+#    option2 = forms.BooleanField()
+    XPU_architecture = forms.ChoiceField([(1,''),(2,'fermi')])
+    XPU_count = forms.IntegerField(required=False)
+#KDS - addional parameters field
+    additional_parameters = forms.CharField(required=False, widget=forms.widgets.Textarea(attrs={'rows': 1}))
+
     def __init__(self, project, *args, **kwargs):
         forms.Form.__init__(self, *args, **kwargs)
         self.fields['key_name'].choices = get_key_pair_choices(project)
         self.fields['size'].choices = get_instance_type_choices()
+
+#KDS - add options to new fields
+        self.fields['CPU_features'].choices = get_cpu_features()
+
+#KDS - combine user options in correct format to be part of ec2 command (TBD)
+#        hetero_data = append_hetero_data(self.size,CPU_features,XPU_architecture,XPU_count,additional_parameters)
+	hetero_data = 'kds_data'
+	print hetero_data
 
 
 class UpdateInstanceForm(forms.Form):
