@@ -6,7 +6,7 @@
           <th>Image</th>
           <th>Size</th>
           <th>IP</th>
-          <th>Architecture</th>
+          <th>Arch</th>
           <th colspan="2">State</th>
         </tr>
         {% for instance in instances %}
@@ -26,20 +26,20 @@
                   </div>
 <!--this is when a row is selected and details appear. added arch field in there -->
                   <div class="instance_detail_item">
-                    <span class="label">Architecture: </span>
+                    <span class="label">Arch: </span>
                     <span class="data">{{ selected_instance.architecture }}</span>
                   </div>
                   <div class="instance_detail_item">
                     <span class="label">Description: </span>
                     <span class="data" id="desc">{{ selected_instance.displayDescription }}</span>
                   </div>
-                </div>
-
-                <div class="column">
                   <div class="instance_detail_item">
                     <span class="label">Region: </span>
                     <span class="data">{{ selected_instance.region.name }}</span>
                   </div>
+                </div>
+
+                <div class="column">
                   <div class="instance_detail_item">
                     <span class="label">Size: </span>
                     <span class="data">{{ selected_instance.instance_type }}</span>
@@ -56,20 +56,8 @@
                     <span class="label">IP Address: </span>
                     <span class="data">{{ selected_instance.dns_name }}</span>
                   </div>
-
-                </div>
-
-                <div id="last" class="column">
-                  {% if instance.state == "running" %}
-                  <a href="{% url nova_instances_console project.projectname instance.id %}" id="console_{{instance.id}}" class="console" target="_blank">Show Console</a>
-                  {% if enable_vnc %}
-                    <a href="{% url nova_instances_vnc project.projectname instance.id %}" id="vnc_{{instance.id}}" class="console" target="_blank">VNC</a>{% endif %}
-                  {% endif %}
-                  <a id="edit_instance_link" href="{% url nova_instance_update project.projectname instance.id %}">Edit Instance</a>
-<!--added (row detail) window close option to the detail window-->
-                  <a id="close_detail" href="{% url nova_instances project.projectname %}">[x] close</a>
-                 </div>
-
+		 <br/>
+		 <br/>
                  <span class="delete">
                     <form id="form_terminate_{{ instance.id }}" class="form-terminate" method="post" action="{% url nova_instances_terminate project.projectname %}" >
                       <input name="instance_id" type="hidden" value="{{ instance.id }}" />
@@ -77,7 +65,19 @@
                       {% csrf_token %}
                     </form>
                   </span>
+                </div>
+		
+                <div id="last" class="column">
+                  <a id="edit_instance_link" href="{% url nova_instance_update project.projectname instance.id %}">Edit Instance</a>
+<!--added (row detail) window close option to the detail window-->
+                  <a id="close_detail" href="{% url nova_instances project.projectname %}">[x] close</a>
 
+                  {% if instance.state == "running" %}
+                  <a href="{% url nova_instances_console project.projectname instance.id %}" id="console_{{instance.id}}" class="console" target="_blank">Show Console</a>
+                  {% if enable_vnc %}
+                    <a href="{% url nova_instances_vnc project.projectname instance.id %}" id="vnc_{{instance.id}}" class="console" target="_blank">VNC</a>{% endif %}
+                  {% endif %}
+		</div>
               </div>
 
             </td>
@@ -89,9 +89,10 @@
             <td>{{ instance.instance_type }}</td>
             <td class="odd">{{ instance.dns_name }}</td>
 <!--obtain value for architecture field-->
-            <td class="data odd">{{ instance.architecture }}</td>
-            <td>{{ instance.state }}</td>
-            <td id="actions" class="odd">
+            <td>{{ instance.architecture }}</td>
+<!--            <td>{{ instance.displayArchitecture }}</td>-->
+            <td class="data odd">{{ instance.state }}</td>
+            <td id="actions">
               <form id="form_terminate_{{ instance.id }}" class="form-terminate" method="post" action="{% url nova_instances_terminate project.projectname %}" >
                 <input name="instance_id" type="hidden" value="{{ instance.id }}" />
                 <input id="terminate_{{instance.id}}" class="terminate" type="submit" value="Terminate" />

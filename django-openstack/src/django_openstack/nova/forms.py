@@ -49,10 +49,6 @@ def get_instance_type_choices():
                       (t.name, t.memory_mb, t.vcpus, t.disk_gb)))
     return rv
 
-#KDS added function to append hetero meta data to instance type field (not being used/has errors..)
-def append_hetero_data(size,CPU_features,XPU_architecture,XPU_count,additional_parameters):
-	rv.append("\"", size, CPU_features, XPU_architecture, XPU_count, additional_parameters, "\"")
-	return rv
 
 def get_instance_choices(project):
     choices = [(i.id, "%s (%s)" % (i.id, i.displayName))
@@ -70,12 +66,7 @@ def get_key_pair_choices(project):
 
 #KDS - options for CPU features selectable by the user. Hardcoded for now...
 def get_cpu_features():
-        choices = [(2,'rdtscp'),(3,'dca'),(4,'xtpr'), \
-                        (5,'tm2'),(6,'est'),(7,'vmx'), \
-                        (8,'ds_cpl'),(9,'monitor'),(10,'pbe'), \
-                        (11,'tm'),(12,'ht'),(13,'ss'), \
-                        (14,'acpi'),(15,'ds'),(16,'vme'), \
-                        (17,'sse'),(18,'sse2'),(19,'sse4')]
+        choices = [('',''),(2,'rdtscp'),(3,'dca'),(4,'xtpr'),(5,'tm2'),(6,'est'),(7,'vmx'),(8,'ds_cpl'),(9,'monitor'),(10,'pbe'),(11,'tm'),(12,'ht'),(13,'ss'),(14,'acpi'),(15,'ds'),(16,'vme'),(17,'sse'),(18,'sse2'),(19,'sse4')]
         return choices
 
 
@@ -165,11 +156,16 @@ class LaunchInstanceForm(forms.Form):
 #    'SplitDateTimeField', 'IPAddressField', 'FilePathField', 'SlugField','TypedChoiceField'
 
 #KDS - add more options for the user
-    hypervisor = forms.ChoiceField(choices=[(1, 'KVM'),(2,'Xen'),(3,'LXC')])
-    CPU_features = forms.MultipleChoiceField(required=False)
+    hypervisor = forms.ChoiceField(required=False,choices=[('',''),('kvm', 'KVM'),('xen','Xen'),('lxc','LXC')])
+#    CPU_features = forms.MultipleChoiceField(required=False)
+    CPU_features = forms.ChoiceField(required=False,choices=[('',''),('rdtscp','rdtscp'),('dca','dca'),('xtpr','xtpr'),\
+			('tm2','tm2'),('est','est'),('vmx','vmx'),('ds_cpl','ds_cpl'),('monitor','monitor'),\
+			('pbe','pbe'),('tm','tm'),('ht','ht'),('ss','ss'),('acpi','acpi'),('ds','ds'),\
+			('vme','vme'),('sse','sse'),('sse2','sse2'),('sse4.1','sse4.1')])
+
 #    HPC_features = forms.MultipleChoiceField(choices=[(1,'sse'),(2,'sse2'),(3,'sse4')])
 #    option2 = forms.BooleanField()
-    XPU_architecture = forms.ChoiceField([(1,''),(2,'fermi')])
+    XPU_architecture = forms.ChoiceField(required=False, choices=[('',''),('fermi','fermi')])
     XPU_count = forms.IntegerField(required=False)
 #KDS - addional parameters field
     additional_parameters = forms.CharField(required=False, widget=forms.widgets.Textarea(attrs={'rows': 1}))
@@ -180,12 +176,7 @@ class LaunchInstanceForm(forms.Form):
         self.fields['size'].choices = get_instance_type_choices()
 
 #KDS - add options to new fields
-        self.fields['CPU_features'].choices = get_cpu_features()
-
-#KDS - combine user options in correct format to be part of ec2 command (TBD)
-#        hetero_data = append_hetero_data(self.size,CPU_features,XPU_architecture,XPU_count,additional_parameters)
-	hetero_data = 'kds_data'
-	print hetero_data
+#        self.fields['CPU_features'].choices = get_cpu_features()
 
 
 class UpdateInstanceForm(forms.Form):
@@ -193,12 +184,14 @@ class UpdateInstanceForm(forms.Form):
     description = forms.CharField(required=False,
                                   widget=forms.Textarea,
                                   max_length=70)
+#KDS - try to pass architecture field using forms
+#    arch = forms.CharField(required=True, label="Arch")
 
     def __init__(self, instance, *args, **kwargs):
         forms.Form.__init__(self, *args, **kwargs)
         self.fields['nickname'].initial = instance.displayName
         self.fields['description'].initial = instance.displayDescription
-
+#	self.fields['arch'] = instance.architecture
 
 class UpdateImageForm(forms.Form):
     nickname = forms.CharField(required=False, label="Name")

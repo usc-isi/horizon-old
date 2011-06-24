@@ -98,11 +98,11 @@
               {% endif %}
             </td>
 <!--obtain value for architecture field-->
-            <td class="data odd">
+            <td class="data">
              {{ image.architecture }}
             </td>
-            <td class="image_owner_id">{{ image.ownerId }}</td>
-            <td class="image_launch_btn odd"><a id="launch_{{ image.id }}" class="launch" href="{% url nova_images_launch project.projectname image.id %}">Launch</a></td>
+            <td class="image_owner_id odd">{{ image.ownerId }}</td>
+            <td class="image_launch_btn"><a id="launch_{{ image.id }}" class="launch" href="{% url nova_images_launch project.projectname image.id %}">Launch</a></td>
             {#<td class="odd"><a class="ui-state-default ui-corner-all" onclick="$('#dlg_launch').dialog('open');">Launch</a></td>#}
           </tr>
         {% endif %}

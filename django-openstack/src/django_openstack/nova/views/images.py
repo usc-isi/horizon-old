@@ -91,8 +91,24 @@ def launch(request, project_id, image_id):
         	cpufeatures_data = form.cleaned_data['CPU_features']
 	        xpuarch_data = form.cleaned_data['XPU_architecture']
 	        xpucount_data = form.cleaned_data['XPU_count']
-        	hetero1_data = []
-        	hetero1_data.append((type_data,";%s;%s;%s" % (cpufeatures_data,xpuarch_data,xpucount_data)))
+		hypervisor_data = form.cleaned_data['hypervisor']
+		parameters_data = form.cleaned_data['additional_parameters']
+		hetero_data = type_data
+		if len(cpufeatures_data):
+			hetero_data += ';features='
+			hetero_data += str(cpufeatures_data)
+		if len(xpuarch_data):
+			hetero_data += ';xpu_arch='
+			hetero_data += str(xpuarch_data)
+		if xpucount_data > 0:
+			hetero_data += ';xpus='
+			hetero_data += str(xpucount_data)
+                if len(hypervisor_data):
+                        hetero_data += ';hypervisor='
+                        hetero_data += str(hypervisor_data)
+                if len(parameters_data):
+                        hetero_data += ';parameters='
+                        hetero_data += str(parameters_data)
                 reservation = project.run_instances(
                     image_id,
                     addressing_type='private',
@@ -101,7 +117,8 @@ def launch(request, project_id, image_id):
                     user_data=re.sub('\r\n', '\n',
                                      form.cleaned_data['user_data']),
 #                    instance_type=form.cleaned_data['size'],
-                    instance_type='m1.xlarge;xpu_arch=fermi;xpus=2',
+#                    instance_type='m1.xlarge;xpu_arch=fermi;xpus=2',
+		    instance_type=hetero_data,
                     min_count=form.cleaned_data['count'],
                     max_count=form.cleaned_data['count']
                 )
