@@ -38,6 +38,10 @@ import boto.ec2.ec2object
 
 LOG = logging.getLogger('django_openstack.nova')
 
+def populate_instance_archs(project, instances):
+    for instance in instances:
+        ami = project.get_image(instance.image_id)
+        instance.architecture = ami.architecture
 
 @login_required
 @handle_nova_error
@@ -45,6 +49,12 @@ def index(request, project_id):
     project = shortcuts.get_project_or_404(request, project_id)
     instances = sorted(project.get_instances(),
                        key=lambda k: k.public_dns_name)
+
+#PAE - Populate the architecture to display
+#    for instance in instances:
+#        ami = project.get_image(instance.image_id)
+#        instance.architecture = ami.architecture
+    populate_instance_archs(project, instances)
 
     return render_to_response('django_openstack/nova/instances/index.html', {
         'region': project.region,
@@ -61,6 +71,14 @@ def detail(request, project_id, instance_id):
     instance = project.get_instance(instance_id)
     instances = sorted(project.get_instances(),
                        key=lambda k: k.public_dns_name)
+
+#PAE - Populate the architecture to display
+#    for instance in instances:
+#        ami = project.get_image(instance.image_id)
+#        instance.architecture = ami.architecture
+    populate_instance_archs(project, instances)
+    ami = project.get_image(instance.image_id)
+    instance.architecture = ami.architecture
 
     if not instance:
         raise http.Http404()
@@ -85,6 +103,9 @@ def performance(request, project_id, instance_id):
     if not instance:
         raise http.Http404()
 
+    ami = project.get_image(instance.image_id)
+    instance.architecture = ami.architecture
+
     return render_to_response(
         'django_openstack/nova/instances/performance.html',
         {'region': project.region,
@@ -104,6 +125,12 @@ def refresh(request, project_id):
     instances = sorted(project.get_instances(),
                        key=lambda k: k.public_dns_name)
 
+#PAE - Populate the architecture to display
+#    for instance in instances:
+#        ami = project.get_image(instance.image_id)
+#        instance.architecture = ami.architecture
+    populate_instance_archs(project, instances)
+
     return render_to_response(
         'django_openstack/nova/instances/_instances_list.html',
         {'project': project,
@@ -121,6 +148,14 @@ def refresh_detail(request, project_id, instance_id):
     instance = project.get_instance(instance_id)
     instances = sorted(project.get_instances(),
                        key=lambda k: k.public_dns_name)
+
+#PAE - Populate the architecture to display
+#    for instance in instances:
+#        ami = project.get_image(instance.image_id)
+#        instance.architecture = ami.architecture
+    populate_instance_archs(project, instances)
+    ami = project.get_image(instance.image_id)
+    instance.architecture = ami.architecture
 
     return render_to_response(
         'django_openstack/nova/instances/_instances_list.html',
@@ -209,6 +244,9 @@ def update(request, project_id, instance_id):
 
     if not instance:
         raise http.Http404()
+
+    ami = project.get_image(instance.image_id)
+    instance.architecture = ami.architecture
 
     if request.method == 'POST':
         form = nova_forms.UpdateInstanceForm(instance, request.POST)
