@@ -47,13 +47,12 @@ def populate_instance_archs(project, instances):
 @handle_nova_error
 def index(request, project_id):
     project = shortcuts.get_project_or_404(request, project_id)
-    instances = sorted(project.get_instances(),
-                       key=lambda k: k.public_dns_name)
+
+#JSUH: sort by id
+#    instances = sorted(project.get_instances(), key=lambda k: k.public_dns_name)
+    instances = sorted(project.get_instances(), key=lambda k: k.id)
 
 #PAE - Populate the architecture to display
-#    for instance in instances:
-#        ami = project.get_image(instance.image_id)
-#        instance.architecture = ami.architecture
     populate_instance_archs(project, instances)
 
     return render_to_response('django_openstack/nova/instances/index.html', {
@@ -69,13 +68,12 @@ def index(request, project_id):
 def detail(request, project_id, instance_id):
     project = shortcuts.get_project_or_404(request, project_id)
     instance = project.get_instance(instance_id)
-    instances = sorted(project.get_instances(),
-                       key=lambda k: k.public_dns_name)
+#JSUH
+#    instances = sorted(project.get_instances(),
+#                       key=lambda k: k.public_dns_name)
+    instances = sorted(project.get_instances(), key=lambda k: k.id)
 
 #PAE - Populate the architecture to display
-#    for instance in instances:
-#        ami = project.get_image(instance.image_id)
-#        instance.architecture = ami.architecture
     populate_instance_archs(project, instances)
     ami = project.get_image(instance.image_id)
     instance.architecture = ami.architecture
@@ -122,13 +120,12 @@ def refresh(request, project_id):
         return http.HttpResponseForbidden()
 
     project = shortcuts.get_project_or_404(request, project_id)
-    instances = sorted(project.get_instances(),
-                       key=lambda k: k.public_dns_name)
+#JSUH
+#    instances = sorted(project.get_instances(),
+#                       key=lambda k: k.public_dns_name)
+    instances = sorted(project.get_instances(), key=lambda k: k.id)
 
 #PAE - Populate the architecture to display
-#    for instance in instances:
-#        ami = project.get_image(instance.image_id)
-#        instance.architecture = ami.architecture
     populate_instance_archs(project, instances)
 
     return render_to_response(
@@ -146,13 +143,12 @@ def refresh_detail(request, project_id, instance_id):
 
     project = shortcuts.get_project_or_404(request, project_id)
     instance = project.get_instance(instance_id)
-    instances = sorted(project.get_instances(),
-                       key=lambda k: k.public_dns_name)
+#JSUH
+#    instances = sorted(project.get_instances(),
+#                       key=lambda k: k.public_dns_name)
+    instances = sorted(project.get_instances(), key=lambda k: k.id)
 
 #PAE - Populate the architecture to display
-#    for instance in instances:
-#        ami = project.get_image(instance.image_id)
-#        instance.architecture = ami.architecture
     populate_instance_archs(project, instances)
     ami = project.get_image(instance.image_id)
     instance.architecture = ami.architecture

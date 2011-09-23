@@ -125,6 +125,9 @@ class ProjectManager(object):
         for reservation in reservations:
             for instance in reservation.instances:
                 instances.append(instance)
+#JSUH: sort
+        instances = sorted(instances, key=lambda k: k.id)
+
         return instances
 
     @wrap_nova_error
@@ -148,8 +151,12 @@ class ProjectManager(object):
         params = {'InstanceId': instance_id,
                   'DisplayName': updates['nickname'],
                   'DisplayDescription': updates['description']}
-        return conn.get_object('UpdateInstance', params,
+#        return conn.get_object('UpdateInstance', params,
+#                               boto.ec2.instance.Instance)
+#JSUH: sort
+        instances = conn.get_object('UpdateInstance', params,
                                boto.ec2.instance.Instance)
+        return sorted(instances, key=lambda k: k.id)
 
     def get_instance_graph(self, region, instance_id, graph_name):
         # TODO(devcamcar): Need better support for multiple regions.
@@ -271,7 +278,7 @@ class ProjectManager(object):
 
         for k in conn.get_all_key_pairs():
             # Do not show vpn key.
-            if k.name != 'vpn-key':
+#            if k.name != 'vpn-key':
                 keys.append(k)
 
         return keys

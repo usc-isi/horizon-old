@@ -21,6 +21,7 @@ Forms used by various views.
 """
 
 import re
+import string
 
 from django import forms
 from django.contrib.auth import models as auth_models
@@ -44,9 +45,18 @@ def get_instance_type_choices():
     nova = get_nova_admin_connection()
     instance_types = nova.get_instance_types()
     rv = []
+
+    # JSUH: multi-level sorting
+    instance_types = sorted(instance_types, key=lambda instance: string.split(instance.name, '.')[1])
+    instance_types = sorted(instance_types, key=lambda instance: int(instance.disk_gb))
+    instance_types = sorted(instance_types, key=lambda instance: int(instance.memory_mb))
+    instance_types = sorted(instance_types, key=lambda instance: int(instance.vcpus))
+    instance_types = sorted(instance_types, key=lambda instance: string.split(instance.name, '.')[0])
+
     for t in instance_types:
-        rv.append((t.name, "%s (%sMB memory, %s cpu, %sGB space)" % \
-                      (t.name, t.memory_mb, t.vcpus, t.disk_gb)))
+        # TODO: JSUH: add xpus information
+        rv.append((t.name, "%s (%s cpus, %s MB memory, %s GB disk)" % \
+                      (t.name, t.vcpus, t.memory_mb, t.disk_gb)))
     return rv
 
 
@@ -59,7 +69,10 @@ def get_instance_choices(project):
 
 
 def get_key_pair_choices(project):
+# JSUH: sorted list now
+#    choices = [(k.name, k.name) for k in project.get_key_pairs()]
     choices = [(k.name, k.name) for k in project.get_key_pairs()]
+    choices = sorted(choices, key=lambda choi: choi[0])
     if not len(choices):
         choices = [('', _('none available'))]
     return choices
@@ -158,10 +171,26 @@ class LaunchInstanceForm(forms.Form):
 #KDS - add more options for the user
     hypervisor = forms.ChoiceField(required=False,choices=[('',''),('kvm', 'KVM'),('xen','Xen'),('lxc','LXC')])
 #    CPU_features = forms.MultipleChoiceField(required=False)
-    CPU_features = forms.ChoiceField(required=False,choices=[('',''),('rdtscp','rdtscp'),('dca','dca'),('xtpr','xtpr'),\
-			('tm2','tm2'),('est','est'),('vmx','vmx'),('ds_cpl','ds_cpl'),('monitor','monitor'),\
-			('pbe','pbe'),('tm','tm'),('ht','ht'),('ss','ss'),('acpi','acpi'),('ds','ds'),\
-			('vme','vme'),('sse','sse'),('sse2','sse2'),('sse4.1','sse4.1')])
+# JSUH: sorted list
+    CPU_features = forms.ChoiceField(required=False,choices=[('',''), \
+            ('acpi','acpi'), \
+            ('dca','dca'), \
+            ('ds','ds'), \
+            ('ds_cpl','ds_cpl'), \
+            ('est','est'), \
+            ('ht','ht'), \
+            ('monitor','monitor'), \
+            ('pbe','pbe'), \
+            ('rdtscp','rdtscp'), \
+            ('ss','ss'), \
+            ('sse','sse'), \
+            ('sse2','sse2'), \
+            ('sse4.1','sse4.1'), \
+            ('tm','tm'), \
+            ('tm2','tm2'), \
+            ('vme','vme'), \
+            ('vmx','vmx'), \
+            ('xtpr','xtpr')])
 
 #    HPC_features = forms.MultipleChoiceField(choices=[(1,'sse'),(2,'sse2'),(3,'sse4')])
 #    option2 = forms.BooleanField()
