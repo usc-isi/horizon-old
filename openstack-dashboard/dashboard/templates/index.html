@@ -5,7 +5,7 @@
 {% endblock %}
 {% block pageclass %}home{% endblock %}
 
-{% block title %} - Cloud Computing{% endblock %}
+{% block title %} - DODCS Cloud Computing{% endblock %}
 
 {% block content %}
   <div id="page_head">
@@ -40,18 +40,10 @@
       <li><a href="http://wiki.openstack.org/OpenStackDashboard" target="_blank">{% trans "OpenStack Dashboard Wiki"%}</a></li>
       <li><a href="https://launchpad.net/openstack-dashboard" target="_blank">{% trans "OpenStack Dashboard Launchpad Repository"%}</a></li>
     </ul>
-    <form action="/i18n/setlang/" method="post"> {% csrf_token %}
-      <p><select name="language">
-      {% for language in languages %}
-          {% if language.code == LANGUAGE_CODE %}
-             <option selected value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
-          {% else %}
-              <option value="{{ language.code }}">{{ language.name_local }} ({{ language.code }})</option>
-          {% endif %}
-      {% endfor %}
-      </select></p>
-      <input type="submit" value="Select Language" />
-    </form>
+    <h3>Bespin Resources</h3>
+      <ul>
+        <li><a href="https://bespin.east.isi.edu/dashboard" target="_blank">Bespin Wiki</a></li>
+      </ul>
   </div>
 
   {% else %}
@@ -85,6 +77,10 @@
         <li><a href="http://openstack.org" target="_blank">OpenStack.org</a></li>
         <li><a href="http://wiki.openstack.org/OpenStackDashboard" target="_blank">{% trans "OpenStack Dashboard Wiki"%}</a></li>
         <li><a href="https://launchpad.net/openstack-dashboard" target="_blank">{% trans "OpenStack Dashboard Launchpad Repository"%}</a></li>
+      </ul>
+    <h3>Bespin Resources</h3>
+      <ul>
+        <li><a href="https://bespin.east.isi.edu/dashboard" target="_blank">Bespin Wiki</a></li>
       </ul>
     </div>
   {% endif %}

@@ -41,6 +41,7 @@ LOG = logging.getLogger('django_openstack.nova')
 def index(request, project_id, download_key=None):
     project = shortcuts.get_project_or_404(request, project_id)
     keypairs = project.get_key_pairs()
+    keypairs = sorted (keypairs, key=lambda kp: kp.name)
 
     return render_to_response('django_openstack/nova/keypairs/index.html', {
         'create_form': forms.CreateKeyPairForm(project),

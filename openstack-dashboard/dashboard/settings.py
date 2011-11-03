@@ -11,8 +11,8 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 SITE_ID = 1
-SITE_BRANDING = 'OpenStack'
-SITE_NAME = 'openstack'
+SITE_BRANDING = 'DODCS OpenStack'
+SITE_NAME = 'DODCS openstack'
 ENABLE_VNC = True
 
 #LOGIN_URL = '/accounts/login'

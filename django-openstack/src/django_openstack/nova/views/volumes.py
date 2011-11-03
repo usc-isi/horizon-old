@@ -40,6 +40,7 @@ LOG = logging.getLogger('django_openstack')
 def index(request, project_id):
     project = shortcuts.get_project_or_404(request, project_id)
     volumes = project.get_volumes()
+    volumes = sorted(volumes, key=lambda vol:vol.id)
 
     return render_to_response(
         'django_openstack/nova/volumes/index.html',

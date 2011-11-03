@@ -18,8 +18,8 @@ TEMPLATE_DIRS = (
     os.path.join(ROOT_PATH, 'tests', 'templates')
 )
 SITE_ID = 1
-SITE_BRANDING = 'OpenStack'
-SITE_NAME = 'openstack'
+SITE_BRANDING = 'DODCS OpenStack'
+SITE_NAME = 'DODCS openstack'
 ENABLE_VNC = True
 NOVA_DEFAULT_ENDPOINT = None
 NOVA_DEFAULT_REGION = 'test'

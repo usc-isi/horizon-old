@@ -60,6 +60,8 @@ def _image_lists(images, project_id):
 def index(request, project_id):
     project = shortcuts.get_project_or_404(request, project_id)
     images = project.get_images()
+    images = sorted(images, key=lambda img: img.displayName)
+    images = sorted(images, key=lambda img: img.architecture)
 
     return render_to_response('django_openstack/nova/images/index.html', {
         'form': forms.LaunchInstanceForm(project),
